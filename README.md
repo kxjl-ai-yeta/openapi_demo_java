@@ -1,111 +1,114 @@
-﻿# yeta开放平台开发接口
+# yeta开放平台开发接口
 
-# 目录
+----------
 
-1. Part1:外呼能力调用 
-2. Part2:结果数据推送
-3. Part3:呼入上下文动态数据获取
+
+### 目录 
+Part1：外呼能力调用
+
+Part2：结果数据推送
+
+Part3：呼入上下文动态数据获取
+
 
 
 # Part1: 外呼能力调用
 
-由企业请求yeta,调用对应能力
+----------
 
 
------
+### 接口协议说明
+
+请求方向：由应用方主动请求yeta开放平台
+
+请求方式：HTTP POST
+
+字符编码：UTF-8
+
+请求头：Content-Type: application/json;charset=UTF-8
+
+返回格式：json
+
+#### 返回json对象说明
+
+yeta开放平台的所有json响应消息采用标准对象定义，全部具有code、message和result三个属性。
+
+名称|类型|说明 
+---|:-:|:-: 
+code|int|返回码。0：成功，其它值表示失败，具体参考“附录：返回码参照”
+message| string|返回码描述
+result|object|返回结果集。
+
+----------
 
 
 # 一、获取token
-功能：获取授权信息  
+功能：获取授权令牌。请求本接口之外的其它接口时，必须在接口url中通过token参数携带令牌。令牌有效期默认1小时，需要在过期前重新获取。
+
 接口地址：https://www.xfyeta.com/openapi/oauth/v1/token  
-请求方式：http post  
-请求header：content-type：application/json;charset=UTF-8  
-返回格式：json  
+
 ## 请求参数说明
-名称| 必填| 类型| 说明
+名称|必填|类型| 说明
 ---|:-:|:-:|:-:
 app_key|是|string|应用的app_key
 app_secret|是|string|应用的app_secret
-## 请求示例
+### 请求示例
 ~~~
+POST /openapi/oauth/v1/token HTTP/1.1
+Host: www.xfyeta.com
+Content-Type: application/json;charset=UTF-8
+Cache-Control: no-cache
+
 {
    "app_key": "ODM1ZTk4ODAtYTMyZC00ZjBiLTkzMDQtY2VjNWU0ZDUyZWQ5",
    "app_secret": "MTM5NUM3NjlGQ0M2REUwN0FBREE3QjUxMkU1Qzg5NUQ="
 }
 ~~~
-名称| 类型|说明
----|:-:|:-:
-code|int|返回码
-message| string|返回描述
-result|object|返回结果集
-## 返回结果集说明
-名称| 类型|说明|备注
----|:-:|:-:|:-:
-token|string|token|
-time_expire|long|过期时间|单位秒，默认3600（一个小时）
-
-## JSON返回示例
+### 响应示例
 ~~~
+HTTP/1.1 200 OK
+Content-Length:98
+Date:Fri, 10 Aug 2018 06:58:01 GMT
+
 {
     "code": 0,  
     "message": "ok",  
     "result": {
        "token": "08236d0aeeee4d5b566db5f4adc41a63",
        "time_expire": 3600
-    }  
-    
+    }      
 }
 ~~~
 
+### result返回结果集说明
+名称|必填| 类型|说明|备注
+---|:-:|:-:|:-:|:-:
+token|是|string|令牌|
+time_expire|是|long|有效期|单位：秒。默认3600。
 
-# 二、查询企业配置信息
-功能：查询企业配置信息  
-接口地址：https://www.xfyeta.com/openapi/config/v1/query?token=08236d0aeeee4d5b566db5f4adc41a63  
-请求方式：http post  
-请求header：content-type：application/json;charset=UTF-8  
-返回格式：json 
- 
-## URL参数说明
+
+----------
+
+
+# 二、查询配置
+功能：查询企业下的各项资源及配置信息
+
+接口地址：https://www.xfyeta.com/openapi/config/v1/query?**token**=08236d0aeeee4d5b566db5f4adc41a63  
+
+
+## 请求参数说明
 名称|必填|类型|说明
 ---|:-:|:-:|:-:
-token|是|string|token参数
+type|否|int|配置项分类。1：话术，2：线路，3：接口，4：发音人，0：全部（默认）。
 
-## 请求示例
+### 请求示例
 ~~~
-https://www.xfyeta.com/openapi/config/v1/query?token=08236d0aeeee4d5b566db5f4adc41a63
+{
+   "type": 0
+}
 ~~~
 
-## 返回参数说明
-名称|类型|说明 
----|:-:|:-: 
-code|int|返回码  
-message| string|返回描述  
-result|object|返回结果集  
-
-## 返回结果集说明
-名称| 类型|说明|备注
----|:-:|:-:|:-:
-lines|数组|线路|
-robots|数组|话术|
-urls|数组|接收接口|
-line_num|string|线路号码|
-concurrents|int|并发数|
-time_work|数组|工作时间|
-status|int|状态|0未使用，1使用中，注意使用中的线路不能再用于创建外呼任务
-time_apply|long|申请时间|时间毫秒数
-time_expire|long|过期时间|单位秒,-1表示永久
-robot_id|string|话术id|
-robot_name|string|话术名称|
-status|int|状态|1审核中，2未通过，3待发布，4已发布
-type|int|话术类型|1普通话术2动态话术
-deleted|int|删除状态|0未删除，1已删除
-time_create|long|创建时间|时间毫秒数
-time_update|long|更新时间|时间毫秒数
-url|string|url 地址
-url_module|string|url 模块
-
-
-## JSON返回示例
+### 响应示例
 ~~~
 {
     "code": 0,  
@@ -123,7 +126,7 @@ url_module|string|url 模块
            {
                "line_num": "055169101408",
                "concurrents": 100,
-               "time_work": ["09:00:00-12:00:00", "13:00:00-17:59:59"],
+               "time_work": ["08:00:00-20:00:00"],
                "status": 0,
                "time_apply": 1527321492000,
                "time_expire": 2592000
@@ -131,8 +134,9 @@ url_module|string|url 模块
        ],
        "robots": [
            {
-               "robot_id": "111",
+               "robot_id": "111111",
                "robot_name": "金融外呼",
+               "call_column":["客户手机号码","姓名","性别"],
                "status": 4,
                "type": 1,
                "deleted": 0,
@@ -142,8 +146,14 @@ url_module|string|url 模块
        ],
        "urls": [
            {
-               "url": "https://www.xfyeta.com",
-               "url_module": "receive"
+               "url": "http://your-service.url/receiveCallRecord",
+               "url_module": "receiveCallRecord"
+           }
+       ],
+       "voices": [
+           {
+               "voice_code": "60020",
+               "voice_name": "春春"
            }
        ]
     }  
@@ -151,16 +161,91 @@ url_module|string|url 模块
 }  
 ~~~
 
-# 三、创建外呼任务
-功能：创建外呼任务
-接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/create?token=08236d0aeeee4d5b566db5f4adc41a63  
-请求方式：http post  
-请求header：content-type：application/json;charset=UTF-8  
-返回格式：json  
-## URL参数说明
-名称|必填| 类型|说明
+
+## result返回结果集说明
+名称| 类型|说明|备注
 ---|:-:|:-:|:-:
-token|是|string|token参数
+**lines**|object[]|线路|
+line_num|string|号码|
+concurrents|int|并发数|
+time_work|string[]|工作时段|
+status|int|状态|0：空闲，1：任务占用中。
+time_apply|long|申请时间|毫秒时间戳
+time_expire|long|有效期|单位：秒。-1：永久有效。
+**robots**|object[]|话术|
+robot_id|string|话术编号|
+robot_name|string|话术名称|
+call_column|string[]|外呼数据列模板|第一列必须是客户手机号，其他列是话术动态信息。
+status|int|话术状态|1：审核中，2：未通过，3：待发布，4：已发布。
+type|int|话术类型|1：普通话术，2：动态话术。
+deleted|int|删除标记|0：未删除，1：已删除。
+time_create|long|创建时间|毫秒时间戳
+time_update|long|更新时间|毫秒时间戳
+**urls**|object[]|接口配置|
+url|string|接口URL|应用方提供给yeta平台调用的接口服务url地址
+url_module|string|接口模块|详见Part2和Part3。
+**voices**|object[]|发音人|
+voice_code|string|发音人编码
+voice_name|string|发音人名称
+
+
+
+----------
+
+
+# 三、直接外呼
+功能：面向便捷外呼业务场景，提交号码数据同时指定线路和机器人话术，直接发起外呼。直接外呼的号码数据将被提交到应用默认对应的长期任务下。如果号码数据中存在不合规记录（例如敏感号码、非手机号等）将会整批失败。
+
+接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/callout?**token**=08236d0aeeee4d5b566db5f4adc41a63  
+
+
+## 请求参数说明
+名称| 必填|类型|说明|备注
+---|:-:|:-:|:-:|:-:
+robot_id|是|string|话术编号|
+line_num|是|string|线路号码|
+call_column|是|string[]|外呼数据列| 
+call_list|是|string[][]|外呼数据行|单次上限50条
+voice_code|否|string|发音人编码|
+
+### 请求示例
+~~~
+{
+    "line_num":"69101338",
+    "robot_id":"719",
+    "call_column":["客户手机号码","姓名"],
+    "call_list":[["13000000001","张先生"],["13000000002","王女士"]],
+    "voice_code":"60030"
+}
+
+~~~
+### 响应示例
+~~~
+{
+    "code": 0,  
+    "message": "ok",  
+    "result": {
+        "total": 2,
+        "task_data_ids": [130,131]
+    }     
+}
+~~~ 
+
+## result返回结果集说明
+名称| 类型|说明
+---|:-:|:-:
+total|int|号码总数
+task_data_ids|long[]|外呼数据行对应的任务数据编号，用于结果推送数据关联。
+
+
+----------
+
+
+# 四、创建外呼任务
+功能：面向需要灵活管控的业务场景。可以按照不同的业务维度创建多组任务、分批多次向指定任务提交号码数据，可以对外呼任务进行启动、暂停、删除等控制操作。
+
+接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/create?**token**=08236d0aeeee4d5b566db5f4adc41a63  
+
 
 ## 请求参数说明
 名称| 必填|类型|说明|备注
@@ -168,13 +253,13 @@ token|是|string|token参数
 task_name|是|string|任务名称|
 line_num|是|string|线路号码|如果是多个，逗号分隔
 robot_id|是|string|话术id|
-recall_count|否|int|外呼失败后重复外呼次数|最大3次，默认0
-time_recall_wait|否|long|重复外呼等待时间|单位秒
+recall_count|否|int|重试外呼次数|最大3次，默认0
+time_recall_wait|否|long|重试等待时间|单位秒
 time_range|否|string[]|外呼时间段|
-time_begin|是|long|任务开始时间|时间毫秒数
-time_end|否|long|任务结束时间|时间毫秒数
+time_begin|是|long|任务开始时间|毫秒时间戳
+time_end|否|long|任务结束时间|毫秒时间戳
 
-## 请求示例
+### 请求示例
 ~~~
 {
    "task_name": "测试外呼",
@@ -188,18 +273,7 @@ time_end|否|long|任务结束时间|时间毫秒数
 }
 ~~~
 
-## 返回参数说明
-名称| 类型|说明
----|:-:|:-:
-code|int|返回码
-message| string|返回描述
-result|object|返回结果集
-## 返回结果集说明
-名称| 类型|说明
----|:-:|:-:
-task_id|string|任务Id
-
-## JSON返回示例
+### 响应示例
 
 ~~~
 {
@@ -211,26 +285,30 @@ task_id|string|任务Id
 }
 ~~~ 
 
-# 四、上传外呼数据
-功能：上传外呼数据  
-接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/insert?token=08236d0aeeee4d5b566db5f4adc41a63  
-请求方式：http post  
-请求header：content-type：application/json;charset=UTF-8  
-返回格式：json 
 
-## URL参数说明
-名称|必填| 类型|说明
----|:-:|:-:|:-:
-token|是|string|token参数
+## result返回结果集说明
+名称| 类型|说明
+---|:-:|:-:
+task_id|string|任务Id。用于任务数据提交和管理。
+
+
+----------
+
+
+# 五、提交任务数据
+功能：向指定任务提交号码数据，可以分多批次提交。
+
+接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/insert?**token**=08236d0aeeee4d5b566db5f4adc41a63  
+
 
 ## 请求参数说明
 名称| 必填|类型|说明|备注
 ---|:-:|:-:|:-:|:-:
 task_id|是|string|任务id|
-call_column|是|string[]|数据列映射|第一列必须是客户手机号码，其他列是话术动态信息 
-call_list|是|string[][]|数据行|最多50条数据
+call_column|是|string[]|数据列映射|
+call_list|是|string[][]|数据行|单次上限50条
 
-## 请求示例
+### 请求示例
 ~~~
 {
    "task_id": "129",
@@ -241,20 +319,8 @@ call_list|是|string[][]|数据行|最多50条数据
      ]
 }
 ~~~  
- 
-## 返回参数说明
-名称| 类型|说明
----|:-:|:-:
-code|int|返回码
-message| string|返回描述
-result|object|返回结果集
-## 返回结果集说明
-名称| 类型|说明|备注
----|:-:|:-:|:-:
-total|int|总数|
-task_data_ids|数组|taskDataId（任务数据标识）数组|依次对应每条数据
 
-## JSON返回示例
+### 响应示例
 
 ~~~
 {
@@ -267,37 +333,35 @@ task_data_ids|数组|taskDataId（任务数据标识）数组|依次对应每条
 }
 ~~~
 
-# 五、启动外呼任务
-功能：启动外呼任务  
-接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/start?token=08236d0aeeee4d5b566db5f4adc41a63   
-请求方式：http post  
-请求header：content-type：application/json;charset=UTF-8  
-返回格式：json  
-## URL参数说明
-名称| 必填| 类型| 说明
----|:-:|:-:|:-:
-token|是|string|token参数
+## result返回结果集说明
+名称| 类型|说明
+---|:-:|:-:
+total|int|号码总数
+task_data_ids|long[]|外呼数据行对应的任务数据编号，用于结果推送数据关联。
+
+
+
+----------
+
+# 六、启动外呼任务
+功能：启动外呼任务，任务将按照预设的开始时间和工作时段进行外呼。 任务启动之后，将不能再提交号码数据。
+
+接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/start?**token**=08236d0aeeee4d5b566db5f4adc41a63   
+
 
 ## 请求参数说明
 名称| 必填|类型|说明
 ---|:-:|:-:|:-:
 task_id|是|string|任务id
 
-## 请求示例
+### 请求示例
 ~~~
 {
    "task_id": "129"
 }
 ~~~
 
-## 返回参数说明
-名称| 类型|说明
----|:-:|:-:
-code|int|返回码
-message| string|返回描述
-result|object|返回结果集
-
-## JSON返回示例
+### 响应示例
 
 ~~~
 {
@@ -307,56 +371,47 @@ result|object|返回结果集
 }
 ~~~ 
 
-# 六、删除外呼任务
-功能：删除外呼任务  
-接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/delete?token=08236d0aeeee4d5b566db5f4adc41a63   
-请求方式：http post  
-请求header：content-type：application/json;charset=UTF-8  
-返回格式：json  
-## URL参数说明
-名称| 必填| 类型| 说明
----|:-:|:-:|:-:
-token|是|string|token参数
+## result返回结果集说明
+无。通过code响应码表示是否成功。
 
-## 请求参数说明
-名称| 必填|类型|说明
----|:-:|:-:|:-:
-task_id|是|string|任务id
-
-## 请求示例
-~~~
-{
-   "task_id": "129"
-}
-~~~
-
-## 返回参数说明
-名称| 类型|说明
----|:-:|:-:
-code|int|返回码
-message| string|返回描述
-result|object|返回结果集
-
-## JSON返回示例
-
-~~~
-{
-    "code": 0,  
-    "message": "ok",  
-    "result": {}     
-}
-~~~ 
 
 # 七、暂停外呼任务
-功能：暂停外呼任务  
-接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/pause?token=08236d0aeeee4d5b566db5f4adc41a63   
-请求方式：http post  
-请求header：content-type：application/json;charset=UTF-8  
-返回格式：json  
-## URL参数说明
-名称| 必填| 类型| 说明
+功能：暂时停止任务呼叫。可以通过启动外呼任务接口恢复任务呼叫。
+
+接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/pause?**token**=08236d0aeeee4d5b566db5f4adc41a63   
+
+## 请求参数说明
+名称| 必填|类型|说明
 ---|:-:|:-:|:-:
-token|是|string|token参数
+task_id|是|string|任务id
+
+### 请求示例
+~~~
+{
+   "task_id": "129"
+}
+~~~
+
+### 响应示例
+
+~~~
+{
+    "code": 0,  
+    "message": "ok",  
+    "result": {}     
+}
+~~~ 
+
+## result返回结果集说明
+无。通过code响应码表示是否成功。
+
+----------
+
+
+# 八、删除外呼任务
+功能：对外呼任务进行强制停止并删除，删除后不能再次启动。
+接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/delete?**token**=08236d0aeeee4d5b566db5f4adc41a63   
+
 
 ## 请求参数说明
 名称| 必填|类型|说明
@@ -369,15 +424,7 @@ task_id|是|string|任务id
    "task_id": "129"
 }
 ~~~
-
-## 返回参数说明
-名称| 类型|说明
----|:-:|:-:
-code|int|返回码
-message| string|返回描述
-result|object|返回结果集
-
-## JSON返回示例
+### 响应示例
 
 ~~~
 {
@@ -387,365 +434,117 @@ result|object|返回结果集
 }
 ~~~ 
 
-
-# 八、查询话术
-功能：查询话术信息  
-接口地址：https://www.xfyeta.com/openapi/config/v1/queryRobots?token=08236d0aeeee4d5b566db5f4adc41a63  
-请求方式：http post  
-请求header：content-type：application/json;charset=UTF-8  
-返回格式：json 
- 
-## URL参数说明
-名称|必填|类型|说明
----|:-:|:-:|:-:
-token|是|string|token参数
-
-## 请求参数说明
-名称| 必填|类型|说明
----|:-:|:-:|:-:
-robot_name|否|string|话术名称
-robot_status|否|int|话术状态
-page_index|否|int|分页页码
-page_size|否|int|分页大小
-
-## 请求示例
-~~~
-{
-   "robot_name": "金融催缴"
-   "page_index": 1,
-   "page_size": 10
-}
-~~~
-
-## 返回参数说明
-名称|类型|说明 
----|:-:|:-: 
-code|int|返回码  
-message| string|返回描述  
-result|object|返回结果集  
-
-## 返回结果集说明
-名称| 类型|说明|备注
----|:-:|:-:|:-:
-robot_id|string|话术id|
-robot_name|string|话术名称|
-status|int|状态|1审核中，2未通过，3待发布，4已发布
-type|int|话术类型|1普通话术2动态话术
-deleted|int|删除状态|0未删除，1已删除
-time_create|long|创建时间|时间毫秒数
-time_update|long|更新时间|时间毫秒数
+## result返回结果集说明
+无。通过code响应码表示是否成功。
 
 
-## JSON返回示例
-~~~
-{
-    "code": 0,  
-    "message": "ok",  
-    "result": {
-       [
-           {
-               "robot_id": "111",
-               "robot_name": "金融催缴",
-               "status": 4,
-               "type": 1,
-               "deleted": 0,
-               "time_create": 1527321492000,
-               "time_update": 1527325092000
-           }
-       ]
-    }  
-    
-}  
-~~~
 
+# 九、查询任务
+功能：查询任务信息和任务列表
 
-# 九、查询线路
-功能：查询线路信息  
-接口地址：https://www.xfyeta.com/openapi/config/v1/queryLines?token=08236d0aeeee4d5b566db5f4adc41a63  
-请求方式：http post  
-请求header：content-type：application/json;charset=UTF-8  
-返回格式：json 
- 
-## URL参数说明
-名称|必填|类型|说明
----|:-:|:-:|:-:
-token|是|string|token参数
-
-
-## 返回参数说明
-名称|类型|说明 
----|:-:|:-: 
-code|int|返回码  
-message| string|返回描述  
-result|object|返回结果集  
-
-## 返回结果集说明
-名称| 类型|说明|备注
----|:-:|:-:|:-:
-line_num|string|线路号码|
-concurrents|int|并发数|
-time_work|数组|工作时间|
-status|int|状态|0未使用，1使用中
-time_apply|long|申请时间|时间毫秒数
-time_expire|long|过期时间|单位秒,-1表示永久
-
-
-## JSON返回示例
-~~~
-{
-    "code": 0,  
-    "message": "ok",  
-    "result": {
-       [
-           {
-               "line_num": "055169101407",
-               "concurrents": 10,
-               "time_work": ["09:00:00-12:00:00", "13:00:00-17:59:59"],
-               "status": 1,
-               "time_apply": 1527321492000,
-               "time_expire": 2592000
-           },
-           {
-               "line_num": "055169101408",
-               "concurrents": 100,
-               "time_work": ["09:00:00-12:00:00", "13:00:00-17:59:59"],
-               "status": 0,
-               "time_apply": 1527321492000,
-               "time_expire": 2592000
-           }
-       ]
-    }  
-    
-}  
-~~~
-
-# 十、查询url
-功能：查询url  
-接口地址：https://www.xfyeta.com/openapi/config/v1/queryUrls?token=08236d0aeeee4d5b566db5f4adc41a63  
-请求方式：http post  
-请求header：content-type：application/json;charset=UTF-8  
-返回格式：json 
- 
-## URL参数说明
-名称|必填|类型|说明
----|:-:|:-:|:-:
-token|是|string|token参数
-
-
-## 返回参数说明
-名称|类型|说明 
----|:-:|:-: 
-code|int|返回码  
-message| string|返回描述  
-result|object|返回结果集  
-
-## 返回结果集说明
-名称| 类型|说明
----|:-:|:-:
-url|string|url 地址
-url_module|string|url 模块
-
-
-## JSON返回示例
-~~~
-{
-    "code": 0,  
-    "message": "ok",  
-    "result": {
-       [
-           {
-               "url": "https://www.xfyeta.com",
-               "url_module": "receive"
-           }
-       ]
-    }  
-    
-}  
-
-# 十一、查询发音人列表
-功能：查询url  
-接口地址：https://www.xfyeta.com/openapi/config/v1/queryVoice?token=08236d0aeeee4d5b566db5f4adc41a63  
-请求方式：http post  
-请求header：content-type：application/json;charset=UTF-8  
-返回格式：json 
- 
-## URL参数说明
-名称|必填|类型|说明
----|:-:|:-:|:-:
-token|是|string|token参数
-
-## 请求参数说明
-名称| 必填|类型|说明
----|:-:|:-:|:-:
-voiceId|否|long|发音人id
-version|否|int|发音人版本 1:TTS 2:XTTS；默认2
-
-## 请求示例
-~~~
-{
-    "voiceId": 34，
-    "version": 1
-}
-~~~
-
-## 返回参数说明
-名称|类型|说明 
----|:-:|:-: 
-code|int|返回码  
-message| string|返回描述  
-result|object|返回结果集  
-
-## 返回结果集说明
-名称| 类型|说明
----|:-:|:-:
-id|long|发音人id
-name|string|发音人名称
-code|string|音色编码
-
-
-## JSON返回示例
-~~~
-{
-    "code": 0,  
-    "message": "ok",  
-    "result": {
-       [
-           {
-                "id": 1,
-                "name": "小柯",
-                "code": "1"
-           }
-       ]
-    }  
-    
-}
-~~~
-
-# 十二、创建外呼任务池
-功能：创建外呼任务池    
-接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/createTaskPool?token=08236d0aeeee4d5b566db5f4adc41a63  
-请求方式：http post  
-请求header：content-type：application/json;charset=UTF-8  
-返回格式：json  
-## URL参数说明
-名称|必填| 类型|说明
----|:-:|:-:|:-:
-token|是|string|token参数
+接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/query?token=08236d0aeeee4d5b566db5f4adc41a63  
 
 ## 请求参数说明
 名称| 必填|类型|说明|备注
 ---|:-:|:-:|:-:|:-:
-task_name|是|string|任务名称|
+task_id|否|string|任务id
+time_begin|否|long|开始时间|
+time_end|否|long|结束时间|
+task_name|否|string|任务名称|模糊检索
+page_size|否|int|页大小|最大值50，默认20
+page_index|否|int|当前页码|从1开始
+sort_name|否|string|排序字段|ID：任务编号，NAME：任务名称，CREATETIME：任务创建时间，STARTTIME：任务开始时间，ENDTIME：任务结束时间
+sort_order|否|string|排序字段方式|"ASC" 正序 "DESC" 倒序
 
-## 请求示例
+
+### 请求示例
 ~~~
 {
-   "task_name": "测试外呼"
+  "time_begin": 153000000
 }
 ~~~
 
-## 返回参数说明
-名称| 类型|说明
----|:-:|:-:
-code|int|返回码
-message| string|返回描述
-result|object|返回结果集
-## 返回结果集说明
-名称| 类型|说明
----|:-:|:-:
-task_id|string|任务Id
-
-## JSON返回示例
+### 响应示例
 
 ~~~
 {
-    "code": 0,  
-    "message": "ok",  
-    "result": {
-       "task_id": "129"
-    }     
-}
-~~~ 
-
-# 十三、添加任务池数据
-功能：添加任务池数据
-接口地址：https://www.xfyeta.com/openapi/config/v1/addTaskPoolData?token=08236d0aeeee4d5b566db5f4adc41a63  
-请求方式：http post  
-请求header：content-type：application/json;charset=UTF-8  
-返回格式：json  
-## URL参数说明
-名称|必填| 类型|说明
----|:-:|:-:|:-:
-token|是|string|token参数
-
-## 请求参数说明
-名称| 必填|类型|说明|备注
----|:-:|:-:|:-:|:-:
-taskId|是|long|任务编码|
-config|是|long|外呼配置|
-taskData|是|map[]|外呼任务数据列表|数据map的key要和speechSkillId话术模版包含匹配
-
-## 外呼配置参数说明
-名称| 必填|类型|说明|备注
----|:-:|:-:|:-:|:-:
-speechSkillId|是|long|话术ID|
-speechCode|否|long|发音人编码|
-speechSpeed|否|int|语速|
-telNum|是|string|外呼使用号码|
-mcp|否|string|MCP引擎组|
-
-
-## 请求示例
-~~~
-{
-  "taskId": 1,
-  "config": {
-    "telNum": "18756056557;18756056558",
-    "mcp": "mcp01",
-    "speechSkillId": 1,
-    "speechCode": "60030",
-    "speechSpeed": 400
-  },
-"taskData": [
-    {
-      "客户手机号码": "13000000001",
-      "职业": "律师",
-      "密码": "t3"
-    },
-    {
-      "客户手机号码": "13000000002",
-      "职业": "老师",
-      "密码": "123456"
+    "code":0,
+    "message":"ok",
+    "result":{
+        "total_rows":30,
+        "rows":[
+            {
+                "task_id":"1909",
+                "task_name":"task_test1",
+                "status":4,
+                "deleted":0,
+                "time_task_start":1533289491345,
+                "time_task_finish":1533820104848,
+                "count_total_task":4,
+                "count_tel":4,
+                "count_recalled":0,
+                "time_task_estimate_begin":1478157571217,
+                "time_task_estimate_end":0,
+                "line_num":"69101338",
+                "robot_id":"719",
+                "robot_name":"测试话术无参数",
+                "voice_code":"60030",
+                "voice_speed":400,
+                "count_max_recall":2,
+                "status_recall":"[1,1]",
+                "time_recall_wait":2000,
+                "time_range":"["07:30:00-23:30:00"]",
+                "intention_push":"["A","B"]",
+                "process_count":7,
+                "process_tel_count":7,
+                "process_through_count":4,
+                "process_through_rate":1,
+                "total_fee":0,
+                "url_file_result":null,
+                "url_file_record":null
+            }
+        ]
     }
-  ]
-}
-
-~~~
-
-## 返回参数说明
-名称| 类型|说明
----|:-:|:-:
-code|int|返回码
-message| string|返回描述
-result|object|返回结果集
-## 返回结果集说明
-名称| 类型|说明
----|:-:|:-:
-total|int|外呼任务数据数量
-task_data_ids|long[]|外呼任务数据编号列表
-
-## JSON返回示例
-
-~~~
-{
-    "code": 0,  
-    "message": "ok",  
-    "result": {
-        "total": 2,
-        "task_data_ids": [130,131]
-    }     
 }
 ~~~ 
+
+
+## result返回结果集说明
+
+名称|类型|必填|说明|值域
+---|:-:|:-:|:-:|:-:
+total_rows|int|总行数
+**rows**|object[]|结果列表
+task_id|string|是|任务id
+task_name|string|否|任务名称
+status|int|是|任务状态|0：新建，1：启动，2：运行，3：暂停，4：完成
+deleted|int|否|删除标志|1：删除，0：正常
+time_task_start|long|否|运行开始时间|毫秒时间戳
+time_task_finish|long|否|运行结束时间|毫秒时间戳
+process_count|int|否|已呼叫次数
+process_tel_count|int|否|已呼叫号码数
+process_through_count|int|否|已接通量
+process_through_rate|double|否|当前接通率
+count_tel|int|否|任务号码量
+count_recalled|int|否|任务已重试次数
+time_task_estimate_begin|long|否|预设开始时间
+time_task_estimate_end|long|否|预设结束时间
+line_num|string|否|线路号码
+robot_id|string|否|话术id
+robot_name|string|否|话术名称
+voice_code|string|否|发音人编码
+voice_speed|int|否|发音人语速
+count_max_recall|int|否|预设任务重试次数
+time_recall_wait|int|否|预设重试外呼等待时间|单位：秒。
+time_range|string|否|预设外呼时间段
+intention_push|string|否|预设推送意向度门限
+total_fee|double|否|总费用(元)|仅完成状态
+url_file_result|string|否|结果文件下载地址|仅完成状态
+url_file_record|string|否|录音文件下载地址|仅完成状态
+
+
+----------
+
 
 # 附录：返回码参照
 ## 成功码参照
@@ -787,18 +586,42 @@ task_data_ids|long[]|外呼任务数据编号列表
 服务级错误（1为系统级错误）|服务模块代码|具体错误代码
 
 
-# Part2:数据推送
-
-由yeta主动向企业预先配置的接口URL进行POST，向企业推送过程和结果数据。
-强烈建议企业在接收推送数据时采用异步处理机制（接收到推送时，立即缓存数据并响应，然后使用异步服务对数据进行业务处理），避免超时造成推送数据丢失。
 
 ----------
+
+
+# Part2:数据推送
+
+
+
+### 接口协议说明
+
+请求方向：由yeta开放平台主动请求应用方
+
+请求方式：HTTP POST
+
+字符编码：UTF-8
+
+返回格式：text
+
+对接说明：
+
+应用方应当按照yeta开放平台的数据推送接口协议，实现并提供各类数据接收服务的接口URL地址；
+yeta开放平台将会在每通电话结束后，主动向应用方URL进行HTTP POST话单、对话、录音的json数据；
+应用方应当立即进行响应，响应内容不限格式，但必须包含success关键字。
+
+强烈建议应用方在接收推送数据时采用异步处理机制，接收到推送数据后立即缓存数据并响应，
+然后再使用异步服务对数据进行业务处理，避免因为网络传输、超时等原因造成推送数据丢失。
+
+----------
+
 # 一、话单推送
-功能：推送话单信息  
+
+接口模块名称：receiveCallRecord
+
 接口地址：[企业预先配置url]  
-请求方式：http post  
-请求header：content-type：application/json;charset=UTF-8  
-返回格式：any  
+
+
 
 ## 请求参数说明
 名称| 必填| 类型| 说明| 备注
@@ -848,7 +671,7 @@ task_result| task_result_desc| 备注
 28 |线路故障 | 线路故障,网络忙
 
 
-## 请求示例
+### 请求示例
 ~~~
 {
     "business_id":"2745",
@@ -870,22 +693,17 @@ task_result| task_result_desc| 备注
 }
 
 ~~~
-## 响应结果说明
-响应结果不限格式，包含success关键字即认为推送成功，否则将重试3次。
 
-## 响应结果示例
+### 响应结果示例
 ~~~
 success
 ~~~
 
 
 # 二、录音推送
-
-功能：推送录音信息  
+接口模块名称：receiveVoice  
 接口地址：[企业预先配置url]  
-请求方式：http post  
-请求header：content-type：application/json;charset=UTF-8  
-返回格式：any  
+
 
 ## 请求参数说明
 名称| 必填| 类型| 说明| 备注
@@ -901,7 +719,7 @@ size|是|long|文件大小|字节
 duration|是|int|录音长度|秒
 
 
-## 请求示例
+### 请求示例
 ~~~
 
 {
@@ -915,10 +733,8 @@ duration|是|int|录音长度|秒
 }
 
 ~~~
-## 响应结果说明
-响应结果不限格式，包含success关键字即认为推送成功，否则将重试3次。
 
-## 响应结果示例
+### 响应结果示例
 ~~~
 success
 ~~~
@@ -927,11 +743,9 @@ success
 
 # 三、会话推送
 
-功能：推送会话交互信息  
+接口模块名称：receiveDialog  
 接口地址：[企业预先配置url]  
-请求方式：http post  
-请求header：content-type：application/json;charset=UTF-8  
-返回格式：any  
+
 
 ## 请求参数说明
 名称| 必填| 类型| 说明| 备注
@@ -975,7 +789,7 @@ NormalNode | 普通交互节点
 
 
 
-## 请求示例
+### 请求示例
 ~~~
 
 {
@@ -1014,36 +828,52 @@ NormalNode | 普通交互节点
 
 
 ~~~
-## 响应结果说明
-响应结果不限格式，包含success关键字即认为推送成功，否则将重试3次。
 
-## 响应结果示例
+### 响应结果示例
 ~~~
 success
 ~~~
 
-# Part3:话术话术上下文动态数据获取
 
-电话呼入时，由yeta主动向企业预先配置的接口URL进行POST请求，获取话术话术上下文动态数据。
-接口响应时间建议不超过300毫秒，避免影响客户电话体验。
-如果机器人话术没有动态数据，可以不实现此接口。
 
 ----------
 
-功能：获取话术话术上下文动态数据  
+
+# Part3:呼入话术上下文动态数据获取
+
+**此接口仅面向电话呼入对接，且话术存在动态数据的业务场景，其它场景可以不实现此接口。**
+
+### 接口协议说明
+
+请求方向：由yeta开放平台在电话呼入时主动请求应用方
+
+请求方式：HTTP POST
+
+字符编码：UTF-8
+
+返回格式：json
+
+对接说明：
+
+应用方应当按照yeta开放平台的接口协议，实现并提供此服务的接口URL地址；
+yeta开放平台将会在每通电话开始时，主动向应用方URL进行HTTP POST请求，
+获取此通电话对应的话术动态数据并执行。
+
+强烈建议应用方的接口响应时间建议不超过500毫秒，且具备高可用性，避免影响客户电话交互体验。
+
+
+
+接口模块名称：getDialogContext  
 接口地址：[企业预先配置url]  
-请求方式：http post  
-请求header：content-type：application/json;charset=UTF-8  
-返回格式：json  
+
 
 ## 请求参数说明
 名称| 必填| 类型| 说明| 备注
 ---|:-:|:-:|:-:|:-:
-business_id||string|企业id|sip头X-business-id
-app_id||string|应用id|sip头X-app-id
-robot_id||string|话术话术id|sip头X-robot-id
-call_relation_id|是|string|业务侧关联id|sip头X-call-relation-id
-
+business_id||string|企业id|取自sip头X-business-id
+app_id||string|应用id|取自sip头X-app-id
+robot_id||string|话术话术id|取自sip头X-robot-id
+call_relation_id|是|string|业务侧关联id|取自sip头X-call-relation-id
 
 
 
