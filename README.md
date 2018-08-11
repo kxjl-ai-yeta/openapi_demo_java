@@ -93,7 +93,7 @@ time_expire|是|long|有效期|单位：秒。默认3600。
 # 二、查询配置
 功能：查询企业下的各项资源及配置信息
 
-接口地址：https://www.xfyeta.com/openapi/config/v1/query?**token**=08236d0aeeee4d5b566db5f4adc41a63  
+接口地址：https://www.xfyeta.com/openapi/config/v1/query?token=08236d0aeeee4d5b566db5f4adc41a63  
 
 
 ## 请求参数说明
@@ -196,7 +196,7 @@ voice_name|string|发音人名称
 # 三、直接外呼
 功能：面向便捷外呼业务场景，提交号码数据同时指定线路和机器人话术，直接发起外呼。直接外呼的号码数据将被提交到应用默认对应的长期任务下。如果号码数据中存在不合规记录（例如敏感号码、非手机号等）将会整批失败。
 
-接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/callout?**token**=08236d0aeeee4d5b566db5f4adc41a63  
+接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/callout?token=08236d0aeeee4d5b566db5f4adc41a63  
 
 
 ## 请求参数说明
@@ -244,7 +244,7 @@ task_data_ids|long[]|外呼数据行对应的任务数据编号，用于结果�
 # 四、创建外呼任务
 功能：面向需要灵活管控的业务场景。可以按照不同的业务维度创建多组任务、分批多次向指定任务提交号码数据，可以对外呼任务进行启动、暂停、删除等控制操作。
 
-接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/create?**token**=08236d0aeeee4d5b566db5f4adc41a63  
+接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/create?token=08236d0aeeee4d5b566db5f4adc41a63  
 
 
 ## 请求参数说明
@@ -298,7 +298,7 @@ task_id|string|任务Id。用于任务数据提交和管理。
 # 五、提交任务数据
 功能：向指定任务提交号码数据，可以分多批次提交。
 
-接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/insert?**token**=08236d0aeeee4d5b566db5f4adc41a63  
+接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/insert?token=08236d0aeeee4d5b566db5f4adc41a63  
 
 
 ## 请求参数说明
@@ -346,7 +346,7 @@ task_data_ids|long[]|外呼数据行对应的任务数据编号，用于结果�
 # 六、启动外呼任务
 功能：启动外呼任务，任务将按照预设的开始时间和工作时段进行外呼。 任务启动之后，将不能再提交号码数据。
 
-接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/start?**token**=08236d0aeeee4d5b566db5f4adc41a63   
+接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/start?token=08236d0aeeee4d5b566db5f4adc41a63   
 
 
 ## 请求参数说明
@@ -378,7 +378,7 @@ task_id|是|string|任务id
 # 七、暂停外呼任务
 功能：暂时停止任务呼叫。可以通过启动外呼任务接口恢复任务呼叫。
 
-接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/pause?**token**=08236d0aeeee4d5b566db5f4adc41a63   
+接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/pause?token=08236d0aeeee4d5b566db5f4adc41a63   
 
 ## 请求参数说明
 名称| 必填|类型|说明
@@ -410,7 +410,7 @@ task_id|是|string|任务id
 
 # 八、删除外呼任务
 功能：对外呼任务进行强制停止并删除，删除后不能再次启动。
-接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/delete?**token**=08236d0aeeee4d5b566db5f4adc41a63   
+接口地址：https://www.xfyeta.com/openapi/outbound/v1/task/delete?token=08236d0aeeee4d5b566db5f4adc41a63   
 
 
 ## 请求参数说明
