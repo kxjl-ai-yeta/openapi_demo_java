@@ -73,7 +73,7 @@ public class HttpUtil {
             }
 
             StringBuffer text = new StringBuffer();
-            BufferedReader ins = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            BufferedReader ins = new BufferedReader(new InputStreamReader(conn.getInputStream(),charset));
             try {
                 while (ins.ready()) {
                     String line = ins.readLine();
